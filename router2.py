@@ -4,7 +4,7 @@ from models import orders,users,items
 from database import sessionlocal
 import auth
 from admin import discount
-from schemas import OrderModel,ShowOrderModel,UpdateModel
+from schemas import OrderModel,ShowOrderModel,OrderUpdateModel
 from typing import List
 from datetime import datetime
 session = sessionlocal()
@@ -87,7 +87,7 @@ async def get_orders(payload =  protected):
 
 #update the orders
 @order.put('/update_order/{order_id}',status_code=201,response_model=ShowOrderModel)
-async def update_order(order_id : int,request:UpdateModel,payload=protected):
+async def update_order(order_id : int,request:OrderUpdateModel,payload=protected):
    current_user = get_current_user(payload)
 
    curr_order = session.query(orders).filter(orders.id == order_id).first()
