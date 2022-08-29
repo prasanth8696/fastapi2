@@ -2,7 +2,7 @@ from fastapi import APIRouter,HTTPException,Depends
 from models import users,orders,items
 from database import sessionlocal
 import auth
-from schemas import ItemModel,UpdateModel,ShowAdminModel,ShowUserModel,ShowItemModel
+from schemas import ItemModel,ItemUpdateModel,ShowAdminModel,ShowUserModel,ShowItemModel
 from typing import List
 from sqlalchemy import and_
 handler = auth.handler()
@@ -63,7 +63,7 @@ async def get_itmes(payload = protected) :
 
 #update items
 @Admin.put('/update_items',status_code=201)
-async def update_items(request:UpdateModel,payload = protected) :
+async def update_items(request:ItemUpdateModel,payload = protected) :
   authorize(payload)
   item = session.query(items).filter(request.id ==items.id).first()
   item.discount = request.discount
