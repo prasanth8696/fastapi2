@@ -55,7 +55,7 @@ class ShowItemModel(BaseModel) :
   class Config :
     orm_mode = True
 
-class UpdateModel(BaseModel) :
+class ItemUpdateModel(BaseModel) :
   id : int
   discount : int = Field(default=0,ge=0,le=100)
   quantity : int = Field(default=10)
@@ -84,7 +84,7 @@ class ShowOrderModel(BaseModel):
   class Config :
     orm_mode = True
 
-class UpdateModel(BaseModel) :
+class OrderUpdateModel(BaseModel) :
   address : str
   class Config :
     orm_mode = True
