@@ -50,3 +50,4 @@ validators==0.20.0
 virtualenv==20.13.1
 Werkzeug==2.1.1
 gunicorn
+psycopg2==2.9.3
