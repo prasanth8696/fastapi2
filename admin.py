@@ -75,7 +75,7 @@ async def update_items(request:ItemUpdateModel,payload = protected) :
     discounted_price = item.original_price
 
   session.commit()
-  return {'msg' : 'Upadted successfully'}
+  return {'msg' : 'Updated successfully'}
 
 
 #Delete items
