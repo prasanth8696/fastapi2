@@ -3,6 +3,8 @@ from database import sessionlocal
 from models import users
 from schemas import SignUpModel,LoginModel
 import auth 
+from auth import get_db
+from sqlalchemy.orm import Session
 
 handler = auth.handler()
 session = sessionlocal()
@@ -20,7 +22,7 @@ async def welcome():
 
 #signup route
 @router.post('/signup',status_code=201)
-async def signup(request:SignUpModel) :
+async def signup(request:SignUpModel,session:Session=Depends(get_db)) :
 
  db_user = session.query(users).filter(users.username == request.username).first()
 
@@ -42,7 +44,7 @@ async def signup(request:SignUpModel) :
 
 #sign in route
 @router.post('/signin',status_code=200)
-async def login(request:LoginModel) :
+async def login(request:LoginModel,session:Session=Depends(get_db)) :
 
   db_user = session.query(users).filter(users.username==request.username).first()
 
