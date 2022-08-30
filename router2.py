@@ -3,11 +3,13 @@ from fastapi import APIRouter,HTTPException,Depends
 from models import orders,users,items
 from database import sessionlocal
 import auth
+from auth import get_db
+from sqlalchemy.orm import Session
 from admin import discount
 from schemas import OrderModel,ShowOrderModel,OrderUpdateModel
 from typing import List
 from datetime import datetime
-session = sessionlocal()
+
 
 handler = auth.handler()
 protected = Depends(handler.verify)
@@ -22,7 +24,7 @@ def get_current_user(payload):
 #post the order
 
 @order.post('/place_order/{item_id}',status_code = 201,response_model=ShowOrderModel) 
-def place_order(item_id : int ,request: OrderModel,payload = protected) :
+def place_order(item_id : int ,request: OrderModel,payload = protected,session:Session=Depends(get_db)) :
     current_user = payload['username']
 
   
@@ -62,7 +64,7 @@ def place_order(item_id : int ,request: OrderModel,payload = protected) :
 
 #Get order details
 @order.get('/get_order/{order_id}',status_code=200,response_model=ShowOrderModel)
-async def get_order(order_id : int,payload = protected):
+async def get_order(order_id : int,payload = protected,session:Session=Depends(get_db)):
   order_details = session.query(orders).filter(orders.id == order_id).first()
   if order_details is  None :
     raise HTTPException(status_code=400,detail = 'Item Not Found')
@@ -75,7 +77,7 @@ async def get_order(order_id : int,payload = protected):
 
 # get user--> all orders
 @order.get('/get_orders',status_code=200,response_model = List[ShowOrderModel])
-async def get_orders(payload =  protected):
+async def get_orders(payload =  protected,session:Session=Depends(get_db)):
   current_user = get_current_user(payload)
 
   # get orders using relationships
@@ -87,7 +89,7 @@ async def get_orders(payload =  protected):
 
 #update the orders
 @order.put('/update_order/{order_id}',status_code=201,response_model=ShowOrderModel)
-async def update_order(order_id : int,request:OrderUpdateModel,payload=protected):
+async def update_order(order_id : int,request:OrderUpdateModel,payload=protected,session:Session=Depends(get_db)):
    current_user = get_current_user(payload)
 
    curr_order = session.query(orders).filter(orders.id == order_id).first()
@@ -102,7 +104,7 @@ async def update_order(order_id : int,request:OrderUpdateModel,payload=protected
 #Delete the orders
 
 @order.delete('/delete/{order_id}',status_code=204)
-async def delete_order(order_id :int,payload = protected):
+async def delete_order(order_id :int,payload = protected,session:Session=Depends(get_db)):
   current_user = get_current_user(payload)
   curr_order = session.query(orders).filter(orders.id==order_id).first()
   if curr_order is None or curr_order.user != current_user:
