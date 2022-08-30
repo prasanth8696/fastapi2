@@ -17,8 +17,7 @@ order = APIRouter(
          prefix = '/order',
          tags = ['ORDERS'] )
 
-def get_current_user(payload):
-  session = Depends(get_db)       
+def get_current_user(payload,session):     
   return session.query(users).filter(users.username==payload['username']).first()
 
 
@@ -79,7 +78,7 @@ async def get_order(order_id : int,payload = protected,session:Session=Depends(g
 # get user--> all orders
 @order.get('/get_orders',status_code=200,response_model = List[ShowOrderModel])
 async def get_orders(payload =  protected,session:Session=Depends(get_db)):
-  current_user = get_current_user(payload)
+  current_user = get_current_user(payload,session)
 
   # get orders using relationships
   orders_all = current_user.orders
@@ -91,7 +90,7 @@ async def get_orders(payload =  protected,session:Session=Depends(get_db)):
 #update the orders
 @order.put('/update_order/{order_id}',status_code=201,response_model=ShowOrderModel)
 async def update_order(order_id : int,request:OrderUpdateModel,payload=protected,session:Session=Depends(get_db)):
-   current_user = get_current_user(payload)
+   current_user = get_current_user(payload,session)
 
    curr_order = session.query(orders).filter(orders.id == order_id).first()
    if curr_order is None or curr_order.user != current_user :
@@ -106,7 +105,7 @@ async def update_order(order_id : int,request:OrderUpdateModel,payload=protected
 
 @order.delete('/delete/{order_id}',status_code=204)
 async def delete_order(order_id :int,payload = protected,session:Session=Depends(get_db)):
-  current_user = get_current_user(payload)
+  current_user = get_current_user(payload,session)
   curr_order = session.query(orders).filter(orders.id==order_id).first()
   if curr_order is None or curr_order.user != current_user:
     raise HTTPException(status_code=404,detail='Order Not Found')
