@@ -4,6 +4,14 @@ from datetime import datetime,timedelta
 from fastapi.security import HTTPAuthorizationCredentials,HTTPBearer
 from passlib.context import CryptContext
 
+def get_db():
+  session = sessionlocal()
+  try :
+    yield session
+  finally :
+     session.close()
+    
+
 
 class handler :
   secret = '51df9e6ea2cfea119c4073e301cce7c9'
