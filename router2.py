@@ -18,6 +18,7 @@ order = APIRouter(
          tags = ['ORDERS'] )
 
 def get_current_user(payload):
+  session = Depends(get_db)       
   return session.query(users).filter(users.username==payload['username']).first()
 
 
