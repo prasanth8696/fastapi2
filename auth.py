@@ -2,7 +2,8 @@ import jwt
 from fastapi import HTTPException,Depends,Security
 from datetime import datetime,timedelta
 from fastapi.security import HTTPAuthorizationCredentials,HTTPBearer
-from passlib.context import CryptContext
+from passlib.context import 
+from database import sessionlocal
 
 def get_db():
   session = sessionlocal()
