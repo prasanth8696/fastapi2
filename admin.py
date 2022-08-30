@@ -6,7 +6,8 @@ from schemas import ItemModel,ItemUpdateModel,ShowAdminModel,ShowUserModel,ShowI
 from typing import List
 from sqlalchemy import and_
 handler = auth.handler()
-session = sessionlocal()
+from auth import get_db
+from sqlalchemy.orm import Session
 protected = Depends(handler.verify)
 
 Admin = APIRouter(
@@ -30,7 +31,7 @@ def discount(price,discount):
   discount = price * discount/100
   return price - discount
 #create items
-@Admin.post('/post_items',status_code=201,response_model=ShowItemModel)
+@Admin.post('/post_items',status_code=201,response_model=ShowItemModel,session:Session=Depends(get_db))
 async def post_item(item : ItemModel,payload = protected) :
   #check user is admin or not
   authorize(payload)
@@ -54,8 +55,8 @@ async def post_item(item : ItemModel,payload = protected) :
   return new_item
 
 #get all items
-@Admin.get('/items',status_code=200,response_model=List[ShowItemModel])
-async def get_itmes(payload = protected) :
+@Admin.get('/items',status_code=200,response_model=List[ShowItemModel],session:Session=Depends(get_db))
+async def get_itmes(payload = protected,) :
   authorize(payload)
   item_values = session.query(items).all()
   return item_values
@@ -63,7 +64,7 @@ async def get_itmes(payload = protected) :
 
 #update items
 @Admin.put('/update_items',status_code=201)
-async def update_items(request:ItemUpdateModel,payload = protected) :
+async def update_items(request:ItemUpdateModel,payload = protected,session:Session = Depends(get_db)) :
   authorize(payload)
   item = session.query(items).filter(request.id ==items.id).first()
   item.discount = request.discount
@@ -80,7 +81,7 @@ async def update_items(request:ItemUpdateModel,payload = protected) :
 
 #Delete items
 @Admin.delete('/delete_items/{id}',status_code=204)
-async def delete_items(id : int,payload=protected):
+async def delete_items(id : int,payload=protected,session:Session=Depends(get_db)):
   authorize(payload)
   item_value = session.query(items).filter(items.id == id).first()
   if item_value is None :
@@ -94,7 +95,7 @@ async def delete_items(id : int,payload=protected):
 #Make user to admin
 
 @Admin.get('/approve',status_code=200)
-async def approve(username : str ,payload = protected):
+async def approve(username : str ,payload = protected,session:Session=Depends(get_db)):
   check_owner(payload)
   user = session.query(users).filter(users.username == username).first()
   if user is None :
@@ -112,7 +113,7 @@ async def approve(username : str ,payload = protected):
 
 
 @Admin.get('/demote',status_code=200)
-async def demote(username : str ,payload = protected):
+async def demote(username : str ,payload = protected,session:Session=Depends(get_db)):
   check_owner(payload)
   if payload['username'] == username :
     raise HTTPException(status_code=400,detail='you cannot demote yourself')
@@ -129,7 +130,7 @@ async def demote(username : str ,payload = protected):
 #Get admin list
 
 @Admin.get('/admin_list',status_code=200,response_model=List[ShowAdminModel])
-async def admin_list(payload = protected):
+async def admin_list(payload = protected,session:Session=Depends(get_db)):
   authorize(payload)
   Admin_list = session.query(users).filter(users.admin == True).all()
   if not Admin_list :
@@ -139,7 +140,7 @@ async def admin_list(payload = protected):
 #get user list
 
 @Admin.get('/user_list',status_code=200,response_model=List[ShowUserModel])
-async def user_list(payload = protected):
+async def user_list(payload = protected,session:Session=Depends(get_db)):
   authorize(payload)
   Users_list = session.query(users).filter (and_(users.admin==False , users.owner==False)).all()
   if not Users_list :
