@@ -27,7 +27,7 @@ class handler :
 
   def encode_token(self,sub):
     payload = {
-                'exp' : datetime.utcnow()+timedelta(days=0,minutes=10),
+                'exp' : datetime.utcnow()+timedelta(days=0,minutes=30),
                 'iat' : datetime.utcnow(),
                  'sub' : sub }
     token = jwt.encode(
