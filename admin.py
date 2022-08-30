@@ -31,8 +31,8 @@ def discount(price,discount):
   discount = price * discount/100
   return price - discount
 #create items
-@Admin.post('/post_items',status_code=201,response_model=ShowItemModel,session:Session=Depends(get_db))
-async def post_item(item : ItemModel,payload = protected) :
+@Admin.post('/post_items',status_code=201,response_model=ShowItemModel)
+async def post_item(item : ItemModel,payload = protected,session:Session=Depends(get_db)) :
   #check user is admin or not
   authorize(payload)
 
@@ -55,8 +55,8 @@ async def post_item(item : ItemModel,payload = protected) :
   return new_item
 
 #get all items
-@Admin.get('/items',status_code=200,response_model=List[ShowItemModel],session:Session=Depends(get_db))
-async def get_itmes(payload = protected,) :
+@Admin.get('/items',status_code=200,response_model=List[ShowItemModel])
+async def get_itmes(payload = protected,session:Session=Depends(get_db)) :
   authorize(payload)
   item_values = session.query(items).all()
   return item_values
