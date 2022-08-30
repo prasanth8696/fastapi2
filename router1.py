@@ -7,7 +7,6 @@ from auth import get_db
 from sqlalchemy.orm import Session
 
 handler = auth.handler()
-session = sessionlocal()
 
 router = APIRouter(
           prefix = '/auth',
