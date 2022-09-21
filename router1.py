@@ -24,11 +24,10 @@ async def welcome():
 async def signup(request:SignUpModel,session:Session=Depends(get_db)) :
 
  db_user = session.query(users).filter(users.username == request.username).first()
-
+ db_email = session.query(users).filter(users.email==request.email).first()
  if db_user is not None :
    raise HTTPException(status_code = 500,detail = 'Username with user already exists...')
- if db_user is not None :
-  if db_user.email == request.email :
+ if db_email is not None :
     raise HTTPException(status_code = 500,detail='email with user already exists...')
 
  new_user = users(
@@ -46,7 +45,7 @@ async def signup(request:SignUpModel,session:Session=Depends(get_db)) :
 async def login(request:LoginModel,session:Session=Depends(get_db)) :
 
   db_user = session.query(users).filter(users.username==request.username).first()
-
+  
   if db_user is None :
 
      raise HTTPException(status_code=401,detail='user doesn\'t exist')
